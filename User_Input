@@ -1,0 +1,75 @@
+MAIN. KeyUpComponent.
+
+import {bootstrap} from 'angular2/platform/browser';
+import {KeyUpComponent} from "./key_up.component";
+
+bootstrap(KeyUpComponent);
+
+KEY_UP.COMPONENT.
+
+import {Component} from 'angular2/core';
+import {ItemList} from "./list.component";
+
+@Component({
+  selector: 'key',
+  template: `<h2>Key Up Event Example</h2>
+  <input #key_val (keyup) = "0">
+  <p>{{key_val.value}}</p>
+  
+    <input (keyup)="onKey($event)">
+    <p>{{val}}</p>
+    <key2></key2>
+    <br><br>
+    <input #myval (keyup.enter)="values=myval.value" (blur)="values=myval.value">
+    <p>{{values}}</p>
+    <p>{{myval.value}}</p>
+  `,
+  directives:[ItemList]
+})
+
+export class KeyUpComponent {
+	val='';
+  onKey(event:KeyboardEvent) {
+    this.val += (event.target).value + ' | ';
+  }
+}
+
+LIST.COMPONENT.
+
+import {Component} from "angular2/core";
+
+@Component({
+   selector:'key2',
+   template:`
+      <ul>
+         <li *ngFor="#listItem of listItems"
+            (click)="onItemClicked(listItem)">{{listItem.name}}
+         </li>
+      </ul>
+      <input type="text" [(ngModel)]="selectedItem.name">
+      <button (click)="onDeleteItem()">Delete Item</button><br><br>
+      <input type="text" #listItem>
+      <button (click)="onAddItem(listItem)">Add Item</button>
+   `
+})
+
+export class ItemList{
+   public listItems = [
+      {name:"apple"},
+      {name:"orange"},
+      {name:"grapes"},
+   ];
+   public selectedItem = {name: ""};
+
+   onItemClicked(listItem){
+      this.selectedItem=listItem;
+   }
+
+   onAddItem(listItem){
+      this.listItems.push({name:listItem.value});
+   }
+
+   onDeleteItem(){
+      this.listItems.splice(this.listItems.indexOf(this.selectedItem),1);
+   }
+}
