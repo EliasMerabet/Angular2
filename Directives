@@ -1,0 +1,159 @@
+INDEX.
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Directives</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.33.3/es6-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.19.20/system-polyfills.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/angular2-polyfills.js"></script>
+    <script src="https://code.angularjs.org/tools/system.js"></script>
+    <script src="https://code.angularjs.org/tools/typescript.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/Rx.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/angular2.dev.js"></script>
+    <script>
+      System.config({
+        transpiler: 'typescript',
+        typescriptOptions: { emitDecoratorMetadata: true },
+        packages: {'app': {defaultExtension: 'ts'}},
+        map: { 'app': './app' }
+      });
+      System.import('app/directives_main')
+            .then(null, console.error.bind(console));
+    </script>
+  </head>
+<body>
+   <app>Loading...</app>
+</body>
+</html>
+
+DIRECTIVES_MAIN.
+
+import {bootstrap} from 'angular2/platform/browser';       //importing bootstrap function
+import {AppComponent} from './directives_app.component';   //importing component function
+bootstrap(AppComponent);
+
+DIRECTIVES_APP.COMPONENT.
+
+import {Component} from 'angular2/core';
+import {listdealgo} from './list_de_algo.component';
+
+@Component({
+  selector: 'app',
+  template: `<div style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);box-shadow: 10px 10px #F2F2F2; border: 1px inset black;">
+  <div style="margin: 10px 10px 10px 10px;">  
+  <h2>{{title}}</h2>
+    <p class="alert alert-success" *ngIf="names.length > 2">Currently there are more than 2 names!</p>
+    <p class="alert alert-danger" *ngIf="names.length <= 2">Currently there are less than 2 names left!</p>
+    <ul>
+         <li *ngFor="#nam of names"
+           (click)="onNameClicked(nam)"
+           >{{ nam.name }}</li>
+        </ul>
+        <input type="text" [(ngModel)]="selectedName.name">
+        <button (click)="onDeleteName()">Delete Name</button><br><br>
+        <input type="text" #nam>
+        <button (click)="onAddName(nam)">Add Name</button>
+        <br>
+        <elias></elias>
+        </div>
+        </div>
+  `,
+  directives: [listdealgo]
+})
+export class AppComponent {
+  title = 'Testing ngIf and ngFor, JS,...';
+
+  public names = [
+    { name: "Eli"},
+    { name: "Myrita"},
+    { name: "Yusepa"},
+    { name: "Donatella"},
+    { name: "Marcolino"}
+  ];
+  
+  public selectedName = {name : ""};
+
+  onNameClicked(nam) {
+    this.selectedName = nam;
+  }
+  onAddName(nam) {
+    this.names.push({name: nam.value});
+  }
+  onDeleteName() {
+    this.names.splice(this.names.indexOf(this.selectedName), 1);
+      this.selectedName.name = "";
+  }
+}
+
+LIST_ALGO.COMPONENT.
+
+import {Component} from "angular2/core";
+import {NgSwitch} from "angular2/core";
+import {NgSwitchWhen} from "angular2/core";
+import {NgSwitchDefault} from "angular2/core";
+import {NgClass} from 'angular2/common';
+
+@Component({
+   selector: "elias",
+   template: `
+       <h2>Items</h2>
+       <ul>
+          <li
+          *ngFor="#Item of Items"
+          (click)="onItemClicked(Item)"
+          >{{ Item.name }}</li>
+       </ul>
+
+       <span [ngSwitch]=selectedItem.name>
+         <p>You selected :
+            <span *ngSwitchWhen="'Melon'">1</span>
+            <span *ngSwitchWhen="'Sandia'">2</span>
+            <span *ngSwitchWhen="'Platano'">3</span>
+            <span *ngSwitchWhen="'Fresa'">4</span>
+            <span *ngSwitchDefault>Nothing</span>
+         </p>
+       </span>
+
+       <div [ngStyle]="setStyles(selectedItem.name)" class="text-success">
+          Thank you for Selecting a {{selectedItem.name}}!!
+       </div>
+		<br>
+       <button [ngClass]="{active: isActive}" (click)="isActive = !isActive">Buy Items</button>
+   `,
+   styles: [`
+       .button {
+          width: 120px;
+          border: medium solid black;
+       }
+       .active {
+          background-color: red;
+       }
+       p{
+          font-weight: bold;
+       }
+   `]
+   directives: [NgClass]
+})
+
+export class listdealgo {
+   public Items = [
+      {name: "Melon"},
+      {name: "Sandia"},
+      {name: "Platano"},
+      {name: "Fresa"},
+   ];
+   
+   public selectedItem = {name: ""};
+   
+   onItemClicked(Item) {
+      this.selectedItem = Item;
+   }
+   setStyles(item) {
+      let styles = {
+        'font-size'  : item? '24px'   : 'none',
+        'visibility' : !item? 'hidden' : 'visible'
+      }
+      return styles;
+   }
+}
