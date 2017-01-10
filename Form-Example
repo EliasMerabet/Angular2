@@ -1,0 +1,155 @@
+INDEX
+
+<html>
+  <head>
+    <title>Contact Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.33.3/es6-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.19.20/system-polyfills.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/angular2-polyfills.js"></script>
+    <script src="https://code.angularjs.org/tools/system.js"></script>
+    <script src="https://code.angularjs.org/tools/typescript.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/Rx.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/angular2.dev.js"></script>
+    <script>
+      System.config({
+        transpiler: 'typescript',
+        typescriptOptions: { emitDecoratorMetadata: true },
+        packages: {'app': {defaultExtension: 'ts'}},
+        map: { 'app': './app' }
+      });
+      System.import('app/form_main')
+            .then(null, console.error.bind(console));
+    </script>
+
+  </head>
+  <body>
+    <app>Loading...</app>
+  </body>
+</html>
+
+FORM-MAIN
+
+import {bootstrap} from 'angular2/platform/browser';
+import {AppComponent} from "./forms_app.component";
+
+bootstrap(AppComponent);
+
+CONTACT.
+
+export class Contact {
+  constructor(
+    public firstname: string,
+    public lastname: string,
+    public country: string,
+    public phone: number
+  ) {  }
+}
+
+FORMS_APP.COMPONENT
+
+import {Component} from 'angular2/core';
+import {ContactComponent} from './contact-form.component'
+
+@Component({
+  selector: 'app',
+  template: '<contact-form></contact-form>',
+  directives: [ContactComponent]
+})
+export class AppComponent { }
+
+CONTACT.FORM.COMPONENT
+
+import {Component} from 'angular2/core';
+import {NgForm}    from 'angular2/common';
+import { Contact } from './contact';
+
+@Component({
+  selector: 'contact-form',
+  templateUrl: 'app/contact-form.component.html'
+})
+
+export class ContactComponent {
+  countries = ['Spain', 'Morocco', 'England', 'France', 'Holland', 'Belgium', 'Bruxes'];
+  contact = new Contact('Elias', 'Merabet', this.countries[0], 626171844);
+  submitted = false;
+  onSubmit() { this.submitted = true; }
+  active = true;
+  newContact() {
+    this.contact = new Contact('', '');
+    this.active = false;
+    setTimeout(()=> this.active=true, 0);
+  }
+}
+
+CONTACT-FORM.COMPONENT.HTML.
+
+<div class="container">
+  <div [hidden]="submitted">
+    <h2>Contact Form</h2>
+    <form *ngIf="active" (ngSubmit)="onSubmit()" #contactForm="ngForm" novalidate>
+      <div class="form-group">
+        <label for="firstname">First Name</label>
+        <input type="text" class="form-control" placeholder="Enter Your First Name" required
+          [(ngModel)]="contact.firstname"
+            ngControl="firstname"  #firstname="ngForm" >
+        <div [hidden]="firstname.valid || firstname.pristine" class="alert alert-danger">
+          firstname is required
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="lastname">Last Name</label>
+        <input type="text" class="form-control" placeholder="Enter Your Last Name" minlength="4" maxlength="24"
+          [(ngModel)]="contact.lastname"
+            ngControl="lastname" required >
+      </div>
+      <div class="form-group">
+        <label for="country">Country</label>
+        <select class="form-control" required
+          [(ngModel)]="contact.country"
+            ngControl="country" #country="ngForm" >
+          <option value="" selected disabled>Select Your Country</option>
+          <option *ngFor="#coun of countries" [value]="coun">{{coun}}</option>
+        </select>
+        <div [hidden]="country.valid || country.pristine" class="alert alert-danger">
+          Country is required
+        </div>
+      </div>
+
+      <div class="form-group">
+         <label for="phone">Phone Number</label>
+         <input type="number" class="form-control" placeholder="Enter Your Phone Number"
+            [(ngModel)]="contact.phone"
+            ngControl="phone"
+         >
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="!contactForm.form.valid">Submit</button>
+      <button type="button" class="btn btn-primary" (click)="newContact()">New Contact</button>
+    </form>
+  </div>
+  <div [hidden]="!submitted">
+    <h2>Your contact details :</h2>
+    <div class="well">
+        <div class="row">
+          <div class="col-xs-2">First Name</div>
+          <div class="col-xs-10  pull-left">{{ contact.firstname }}</div>
+        </div>
+        <div class="row">
+          <div class="col-xs-2">Last Name</div>
+          <div class="col-xs-10 pull-left">{{ contact.lastname }}</div>
+        </div>
+        <div class="row">
+          <div class="col-xs-2">Country</div>
+          <div class="col-xs-10 pull-left">{{ contact.country }}</div>
+        </div>
+        <div class="row">
+        <div class="col-xs-2">Phone Number</div>
+        <div class="col-xs-10 pull-left">{{ contact.phone }}</div>
+      </div>
+        <br>
+        <button class="btn btn-primary" (click)="submitted=false">Edit Contact</button>
+    </div>
+  </div>
+</div>
