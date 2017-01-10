@@ -1,0 +1,114 @@
+INDEX
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Services</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.33.3/es6-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.19.20/system-polyfills.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/angular2-polyfills.js"></script>
+    <script src="https://code.angularjs.org/tools/system.js"></script>
+    <script src="https://code.angularjs.org/tools/typescript.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/Rx.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/angular2.dev.js"></script>
+    <script>
+      System.config({
+        transpiler: 'typescript',
+        typescriptOptions: { emitDecoratorMetadata: true },
+        packages: {'app': {defaultExtension: 'ts'}},
+        map: { 'app': './app' }
+      });
+      System.import('app/services_main')
+            .then(null, console.error.bind(console));
+    </script>
+  </head>
+<body>
+   <app>Loading...</app>
+</body>
+</html>
+
+SERVICES_MAIN
+
+import {bootstrap} from 'angular2/platform/browser';     //importing bootstrap function
+import {AppComponent} from "./app_service.component";    //importing component function
+
+bootstrap(AppComponent);
+
+APP_SERVICES.COMPONENT.
+
+import {Component} from 'angular2/core';
+import {MyListComponent} from "./service-list.component";
+
+@Component({
+    selector: 'app',
+    template: `
+    <country-list></country-list>
+    `,
+    directives: [MyListComponent]
+})
+export class AppComponent {
+}
+
+SERVICE-LIST.COMPONENT.
+
+import {Component} from "angular2/core";
+import {CountryService} from "./country.service";
+import {Contact} from "./country";
+import {OnInit} from "angular2/core";
+
+@Component({
+   selector: "country-list",
+   template: ` List of Countries<br>
+   <ul>
+      <li *ngFor="#cntry of countries">{{ cntry.name }}</li>
+   </ul>
+   `,
+   providers: [CountryService]
+})
+
+export class MyListComponent implements OnInit {
+   public countries : Country[];
+   constructor(private _countryService: CountryService) {}
+
+   getContacts(){
+      this._countryService.getContacts().then((countries: Country[]) => this.countries = countries);
+   }
+
+ngOnInit():any{
+   this.getContacts();
+}
+}
+
+COUNTRY.SERVICE.
+
+import {Injectable} from "angular2/core";
+import {COUNTRIES} from "./country.contacts";
+
+//@Injectable() specifies class is available to an injector for instantiation and an injector will display an error when trying to instantiate a class that is not marked as @Injectable()
+
+@Injectable()
+
+//CountryService exposes the getContacts() method that returns the data
+export class CountryService {
+   getContacts() {
+      return Promise.resolve(COUNTRIES); // takes values from country.contacts typescript file
+   }
+}
+
+COUNTRY.CONTACT.
+
+import {Country} from "./country";
+
+//storing array of data in Country
+export const COUNTRIES: Country[] =[
+   {name :"Spain"},
+   {name: "England"},
+   {name: "Morocco"},
+   {name: "Holland"}
+];
+
+COUNTRY
+
+export interface Country{
+   name: string
+}
