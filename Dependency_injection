@@ -1,0 +1,138 @@
+INDEX.
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dependency Injection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.33.3/es6-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.19.20/system-polyfills.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/angular2-polyfills.js"></script>
+    <script src="https://code.angularjs.org/tools/system.js"></script>
+    <script src="https://code.angularjs.org/tools/typescript.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/Rx.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-beta.6/angular2.dev.js"></script>
+    <script>
+      System.config({
+        transpiler: 'typescript',
+        typescriptOptions: { emitDecoratorMetadata: true },
+        packages: {'app': {defaultExtension: 'ts'}},
+        map: { 'app': './app' }
+      });
+      System.import('app/dependency_main')
+            .then(null, console.error.bind(console));
+    </script>
+  </head>
+<body>
+   <app>Loading...</app>
+</body>
+</html>
+
+DEPENDENCY_MAIN.
+
+import {bootstrap} from 'angular2/platform/browser';     //importing bootstrap function
+import {VideoclubComponent} from "./videoclub-component";          //importing component function
+
+bootstrap(VideoclubComponent);
+
+VIDEOCLUB-COMPONENT.
+
+import {Component} from 'angular2/core';
+import {ListComponent}  from './cartelera-component';
+
+//@Component is a decorator that uses configuration object to create the component and its view.
+@Component({
+  selector: 'app',   //The selector creates an instance of the component where it finds 'my-app' tag in parent HTML
+  template:`<list></list>`,
+  directives:[ListComponent]  //'MyListComponent' is the root component of fruits that governs child components
+})
+export class VideoclubComponent { }
+
+CARTELERA-COMPONENT.
+
+import {Component} from "angular2/core";
+import {PeliculasService} from "./peliculas.service";
+import {Pelicula} from "./peliculas";
+import {OnInit} from "angular2/core";
+import {NgClass} from 'angular2/common';
+
+@Component({
+   selector: "list",
+   template: ` <div [ngClass]="'center'" [ngStyle]="{'box-shadow': '10px 10px 5px #D8D8D8', 'padding': '100px 100px 100px 100px', 'border': '2px solid black'}" >
+   <h3>List of movies</h3>
+   <ul>
+      <li *ngFor="#list of cartelera" (click)="seleccionado(list)">
+      		<p> Titulo:  {{ list.name }}</p>
+         	<p> Duracion:  {{ list.duracion }}</p>
+      </li>
+   </ul><br>
+   <p>{{selectedMovie.name}} - {{selectedMovie.duracion}}</p>
+   </div>
+   `,
+   styles: [`
+   .center { 
+   		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+   	}
+   `],
+   directives: [NgClass],
+   providers: [PeliculasService]
+})
+
+export class ListComponent implements OnInit {
+   public cartelera : Pelicula[];
+   public selectedMovie = {name: "nada", duracion: 0};
+
+   //Using constructor, call the _peliculasService and populate the pelilulas list
+   constructor(private _peliculasService: PeliculasService) {}
+
+   seleccionado(list){
+      alert('entro');
+      this.selectedMovie=list;
+   }
+   
+   getPeliculas(){
+      this._peliculasService.getPeliculas().then((cartelera1: Pelicula[]) => this.cartelera = cartelera1);
+   }
+
+   //The 'ngOnInit()' hook is called when done with creating the component and evaluated the inputs
+   ngOnInit():any{
+      this.getPeliculas();
+   }
+}
+
+PELICULAS.SERVICE.
+
+import {Injectable} from "angular2/core";
+import {PELICULAS} from "./peliculas.lists";
+
+//It is used for meta data generation and specifies that class is available to an injector for instantiation
+@Injectable()
+
+//'PeliculasService' exposes 'getPeliculas()' method that returns list of data
+export class PeliculasService {
+   getPeliculas() {
+      return Promise.resolve(PELICULAS); // takes values from peliculas.lists.ts file
+   }
+}
+
+PELICULAS.LISTS.
+
+import {Pelicula} from "./peliculas";
+
+//storing array of data in Pelicula
+export const PELICULAS: 
+Pelicula[] =[
+   {"id": 1, name :"Rambo", duracion : 100},
+   {"id": 2, name: "Matrix", duracion : 110},
+   {"id": 3, name: "Hero", duracion :120},
+];
+
+PELICULAS.
+
+export interface Pelicula{
+   id: number;
+   name: string;
+   duracion: number;
+}
