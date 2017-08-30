@@ -9,4 +9,9 @@ import {CarteleraListComponent} from './cartelera-list.component'
 })
 
 export class CarteleraComponent {
+	constructor(private menuStateService: MenuStateService) {}
+	
+    ngOnInit(): void {
+        this.menuStateService.enable();
+    }
 }
