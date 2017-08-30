@@ -52,5 +52,9 @@ import { Component } from '@angular/core';
 })
 
 export class Index { 
-  
+  constructor(private menuStateService: MenuStateService) {}
+	
+  ngOnInit(): void {
+        this.menuStateService.disable();
+}
 }
